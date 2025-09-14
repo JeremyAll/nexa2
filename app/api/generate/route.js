@@ -50,7 +50,9 @@ export async function POST(request) {
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({
               type: 'content',
-              chunk: result
+              chunk: result,
+              model: model,
+              fastMode: !!request.headers.get('x-fast-mode')
             })}\n\n`)
           );
 

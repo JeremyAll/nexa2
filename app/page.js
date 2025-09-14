@@ -25,6 +25,7 @@ export default function HomePage() {
   const [showPreview, setShowPreview] = useState(false);
   const [activeTab, setActiveTab] = useState('preview');
   const [selectedFile, setSelectedFile] = useState(null);
+  const [detectedDomain, setDetectedDomain] = useState('general');
 
   const steps = [
     { icon: '🧠', label: 'Analyse', message: 'Analyse intelligente du prompt...' },
@@ -109,6 +110,7 @@ export default function HomePage() {
     switch (message.type) {
       case 'domain':
         setCurrentStep(0);
+        setDetectedDomain(message.domain || 'general');
         addMessage(`🎯 ${message.message}`, 'info');
         setProgress(5);
         break;
@@ -295,8 +297,13 @@ document.addEventListener('DOMContentLoaded', function() {
             <div className="text-white font-medium">
               {prompt.slice(0, 60)}...
             </div>
+            {detectedDomain !== 'general' && (
+              <div className="mt-2 text-xs bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 rounded-lg px-2 py-1">
+                🎯 {detectedDomain.toUpperCase()} Expert Mode
+              </div>
+            )}
             <button
-              onClick={() => { setShowPreview(false); setProgress(0); setCurrentStep(0); }}
+              onClick={() => { setShowPreview(false); setProgress(0); setCurrentStep(0); setDetectedDomain('general'); }}
               className="mt-2 text-xs text-purple-400 hover:text-purple-300"
             >
               ← Nouveau projet

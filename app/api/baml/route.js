@@ -1,6 +1,6 @@
-// app/api/baml/route.js - Simplified BAML API for Vercel
+// app/api/baml/route.js - BAML Pragmatic API with Domain Intelligence
 
-import { StreamingHandler } from '../../../src/streaming-handler.js';
+import { BAMLPragmatic } from '../../../src/baml-system/baml-pragmatic.js';
 
 export async function POST(request) {
   // Environment check and logging
@@ -24,53 +24,55 @@ export async function POST(request) {
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          console.log('🎯 Initializing StreamingHandler...');
-          const handler = new StreamingHandler();
+          console.log('🎯 Initializing BAML Pragmatic...');
+          const baml = new BAMLPragmatic();
 
-          // Use Sonnet-4 for BAML mode (high quality)
-          const model = 'claude-sonnet-4-20250514';
+          console.log(`🧠 BAML Pragmatic: Domain Detection + SCoT Enhancement`);
 
-          console.log(`🤖 Using model: ${model}`);
-
-          // Simulate BAML progress for UI compatibility
+          // Detect domain first
+          const domain = await baml.detectDomain(prompt);
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({
               type: 'domain',
-              domain: 'general',
-              message: 'Domain detected: general'
+              domain: domain,
+              message: `Domain detected: ${domain}`
             })}\n\n`)
           );
 
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({
               type: 'generation_start',
-              message: 'Starting AI generation with enhanced prompting...'
+              message: `Starting BAML Pragmatic generation with ${domain} expertise...`
             })}\n\n`)
           );
 
-          // Add progress callback for debugging
+          // Add progress callback for streaming updates
           const onProgress = (progress) => {
-            console.log('Progress:', progress);
+            console.log('BAML Progress:', progress);
             controller.enqueue(
               encoder.encode(`data: ${JSON.stringify({
                 type: 'progress',
+                domain: domain,
                 ...progress
               })}\n\n`)
             );
           };
 
-          const result = await handler.generateWithStream(prompt, model, onProgress);
+          // Use BAML Pragmatic for domain-aware generation
+          const result = await baml.generate(prompt);
 
-          // Stream the final result
+          // Stream the final result with domain intelligence
           controller.enqueue(
             encoder.encode(`data: ${JSON.stringify({
               type: 'content',
               chunk: result,
-              domain: 'general',
+              domain: domain,
               stats: {
-                domain: 'general',
+                domain: domain,
                 promptLength: prompt.length,
-                resultLength: result.length
+                resultLength: result.length,
+                bamlPragmatic: true,
+                scotEnhancement: true
               }
             })}\n\n`)
           );
